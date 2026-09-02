@@ -1,0 +1,197 @@
+{
+  "info": {
+    "name": "AI Recruitment Copilot API",
+    "description": "Complete API collection for the AI Recruitment Copilot backend. Upload resumes, manage candidates, search, and view dashboard statistics.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/health"
+      }
+    },
+    {
+      "name": "Upload Resume",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Response has candidate', function () { const data = pm.response.json(); pm.expect(data).to.have.property('candidate'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/upload",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": "/path/to/your/resume.pdf"
+            }
+          ]
+        },
+        "description": "Upload a PDF or DOCX resume file (max 10MB). Returns extracted candidate data."
+      }
+    },
+    {
+      "name": "Get All Candidates",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Response has candidates array', function () { const data = pm.response.json(); pm.expect(data).to.have.property('candidates'); pm.expect(data.candidates).to.be.an('array'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/candidates?page=1&per_page=10&sort_by=created_at&sort_order=desc",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "candidates"],
+          "query": [
+            { "key": "page", "value": "1" },
+            { "key": "per_page", "value": "10" },
+            { "key": "sort_by", "value": "created_at" },
+            { "key": "sort_order", "value": "desc" }
+          ]
+        },
+        "description": "Retrieve paginated list of candidates with sorting options."
+      }
+    },
+    {
+      "name": "Get Candidate by ID",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Response has id', function () { const data = pm.response.json(); pm.expect(data).to.have.property('id'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/candidates/1",
+        "description": "Get detailed information for a specific candidate by ID."
+      }
+    },
+    {
+      "name": "Update Candidate",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "url": "{{baseUrl}}/api/candidates/1",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"shortlisted\",\n  \"skills\": [\"Python\", \"FastAPI\", \"React\", \"PostgreSQL\"]\n}"
+        },
+        "description": "Update candidate information. Only provided fields are updated."
+      }
+    },
+    {
+      "name": "Delete Candidate",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/api/candidates/1",
+        "description": "Permanently delete a candidate from the database."
+      }
+    },
+    {
+      "name": "Search Candidates",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/search?name=&email=&skill=Python&page=1&per_page=10",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "search"],
+          "query": [
+            { "key": "name", "value": "" },
+            { "key": "email", "value": "" },
+            { "key": "skill", "value": "Python" },
+            { "key": "education", "value": "" },
+            { "key": "experience", "value": "" },
+            { "key": "status", "value": "" },
+            { "key": "page", "value": "1" },
+            { "key": "per_page", "value": "10" }
+          ]
+        },
+        "description": "Search candidates by name, email, skill, education, experience, or status."
+      }
+    },
+    {
+      "name": "Get Dashboard",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Response has stats', function () { const data = pm.response.json(); pm.expect(data).to.have.property('totalCandidates'); pm.expect(data).to.have.property('uploadsToday'); pm.expect(data).to.have.property('parsed'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/dashboard",
+        "description": "Get recruitment dashboard statistics and metrics."
+      }
+    }
+  ]
+}
