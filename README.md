@@ -137,7 +137,6 @@ src/
 
 This frontend expects a backend API server running at `http://127.0.0.1:8000`. The Vite dev server proxies all `/api` requests to the backend. See the backend project for API documentation.
 
-Default admin credentials: `admin@recruit.ai` / `admin123`
 
 
 # AI Recruitment Copilot — Backend
