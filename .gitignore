@@ -1,0 +1,48 @@
+# === Dependencies ===
+node_modules/
+
+# === Build output ===
+dist/
+build/
+
+# === Environment & secrets ===
+.env
+.env.local
+
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+venv/
+*.egg-info/
+
+# === Database ===
+*.db
+*.sqlite3
+
+# === Logs & runtime artifacts ===
+logs/
+*.log
+backend_server.err
+backend_server.out
+server_err.log
+server_out.log
+
+# === Backend runtime uploads / extracted data ===
+app/uploads/*
+app/extracted_data/*
+app/logs/*
+!app/uploads/.gitkeep
+!app/extracted_data/.gitkeep
+!app/logs/.gitkeep
+
+# === Editor / OS ===
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# === Stray shell artifacts ===
+cls
