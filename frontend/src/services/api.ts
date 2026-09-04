@@ -1,7 +1,5 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios';
 import type {
-  AuthResponse,
-  AuthUser,
   BackendCandidate,
   CandidateListResponse,
   CandidateSearchParams,
@@ -15,6 +13,7 @@ import type {
   JobPositionUpdateInput,
   VoiceScreeningInput,
   VoiceScreeningItem,
+  VoiceScreeningTranscriptResponse,
   CandidateMatchItem,
 
 
@@ -42,8 +41,6 @@ import type {
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 export type {
-  AuthResponse,
-  AuthUser,
   BackendCandidate,
   CandidateListResponse,
   CandidateSearchParams,
@@ -73,22 +70,11 @@ export type {
   SimulationAnswerResponse,
   SimulationQuestion,
   SimulationAnswerFeedback,
+  VoiceScreeningInput,
+  VoiceScreeningItem,
+  VoiceScreeningTranscriptResponse,
 } from '../types/api';
 
-
-const TOKEN_KEY = 'rc_access_token';
-
-export function getStoredToken(): string | null {
-  return localStorage.getItem(TOKEN_KEY);
-}
-
-export function storeToken(token: string): void {
-  localStorage.setItem(TOKEN_KEY, token);
-}
-
-export function clearStoredToken(): void {
-  localStorage.removeItem(TOKEN_KEY);
-}
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -96,21 +82,9 @@ const apiClient: AxiosInstance = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-apiClient.interceptors.request.use((config) => {
-  const token = getStoredToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    // The app runs without a mandatory login screen; the backend authorizes
-    // requests against the seeded default admin when no token is supplied.
-    // A 401 is surfaced through getErrorMessage() rather than redirecting to
-    // a login page.
     return Promise.reject(error);
   }
 );
@@ -191,21 +165,6 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
   return data;
 }
 
-export async function loginRequest(email: string, password: string): Promise<AuthResponse> {
-  const { data } = await apiClient.post<AuthResponse>('/auth/login', { email, password });
-  return data;
-}
-
-export async function registerRequest(name: string, email: string, password: string): Promise<AuthResponse> {
-  const { data } = await apiClient.post<AuthResponse>('/auth/register', { name, email, password });
-  return data;
-}
-
-export async function fetchCurrentUser(): Promise<AuthUser> {
-  const { data } = await apiClient.get<AuthUser>('/auth/me');
-  return data;
-}
-
 export async function uploadResume(
   file: File,
   onProgress?: (percent: number) => void
@@ -248,6 +207,31 @@ export async function deleteJobPosition(jobId: number): Promise<void> {
 
 export async function submitVoiceScreening(payload: VoiceScreeningInput): Promise<VoiceScreeningItem> {
   const { data } = await apiClient.post<VoiceScreeningItem>('/voice-screening/submit', payload);
+  return data;
+}
+
+export async function transcribeVoiceScreening(
+  candidateId: number,
+  jobPositionId: number,
+  audioBlob: Blob,
+  durationSeconds: number = 0
+): Promise<VoiceScreeningTranscriptResponse> {
+  const formData = new FormData();
+  formData.append('candidate_id', String(candidateId));
+  formData.append('job_position_id', String(jobPositionId));
+  formData.append('duration_seconds', String(durationSeconds));
+  formData.append('audio', audioBlob, 'recording.webm');
+
+  const config: AxiosRequestConfig = {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: 120000,
+  };
+
+  const { data } = await apiClient.post<VoiceScreeningTranscriptResponse>(
+    '/voice-screening/transcribe',
+    formData,
+    config
+  );
   return data;
 }
 

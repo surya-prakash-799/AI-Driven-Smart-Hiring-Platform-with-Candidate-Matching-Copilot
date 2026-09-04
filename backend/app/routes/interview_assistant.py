@@ -7,7 +7,6 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.routes.deps import get_current_user
 from app.schemas.interview import (
     QuestionGeneratorRequest,
     QuestionGeneratorResponse,
@@ -22,7 +21,6 @@ from app.services.ai_client import AIError
 router = APIRouter(
     prefix="/interview",
     tags=["Interview Assistant"],
-    dependencies=[Depends(get_current_user)],
 )
 
 

@@ -2,11 +2,10 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.routes.deps import get_current_user
 from app.schemas.candidate import CandidateListResponse, DashboardResponse
 from app.services import candidate_service
 
-router = APIRouter(dependencies=[Depends(get_current_user)])
+router = APIRouter()
 
 
 @router.get(

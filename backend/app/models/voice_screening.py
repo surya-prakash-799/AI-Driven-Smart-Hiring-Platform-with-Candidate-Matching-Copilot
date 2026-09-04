@@ -16,7 +16,7 @@ class VoiceScreening(Base):
     job_position_id: Mapped[int] = mapped_column(Integer, ForeignKey("job_positions.id"), nullable=False)
     status: Mapped[str] = mapped_column(String(50), default="Completed")
     duration_seconds: Mapped[int] = mapped_column(Integer, default=0)
-    audio_file: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    transcript: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     result_summary: Mapped[str] = mapped_column(Text, default="Voice screening recorded and processed successfully.")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 

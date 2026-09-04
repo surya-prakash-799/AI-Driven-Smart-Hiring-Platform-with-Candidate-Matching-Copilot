@@ -11,37 +11,14 @@ from sqlalchemy.exc import OperationalError
 from app.core.config import get_settings
 from app.core.database import SessionLocal, check_db_connection, dispose_engine, init_db
 from app.core.logging import setup_logging
-from app.models import Candidate, Interview, InterviewAnswer, InterviewQuestion, JobPosition, ShortlistedCandidate, User, VoiceScreening  # noqa: F401  (registers models on Base.metadata)
-from app.routes import auth, candidates, dashboard, interview_assistant, interviews, job_positions, upload, voice_screening
+from app.models import Candidate, Interview, InterviewAnswer, InterviewQuestion, JobPosition, ShortlistedCandidate, VoiceScreening  # noqa: F401  (registers models on Base.metadata)
+from app.routes import candidates, dashboard, interview_assistant, interviews, job_positions, upload, voice_screening
 
 from app.schemas.candidate import HealthResponse
 from app.utils.file_helper import ensure_directories
-from app.utils.security import hash_password
 
 settings = get_settings()
 setup_logging(settings)
-
-
-def seed_default_admin() -> None:
-    """Create the default admin account on first run so the app is usable."""
-    try:
-        db = SessionLocal()
-        try:
-            exists = db.query(User).filter(User.email == "admin@recruit.ai").first()
-            if not exists:
-                db.add(
-                    User(
-                        name="Sarah Jenkins",
-                        email="admin@recruit.ai",
-                        password_hash=hash_password("admin123"),
-                    )
-                )
-                db.commit()
-                logger.info("Seeded default admin account: admin@recruit.ai")
-        finally:
-            db.close()
-    except Exception as e:
-        logger.warning(f"Could not seed default admin account: {e}")
 
 
 def seed_default_job_positions() -> None:
@@ -126,7 +103,6 @@ async def lifespan(app: FastAPI):
     db_ok, db_message = init_db()
     if db_ok:
         logger.info("✓ Database Connected")
-        seed_default_admin()
         seed_default_job_positions()
     else:
         logger.error(
@@ -160,7 +136,6 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_tags=[
-        {"name": "Auth", "description": "Registration, sign in, and session validation"},
         {"name": "Upload", "description": "Resume upload and parsing operations"},
         {"name": "Candidates", "description": "Candidate CRUD operations"},
         {"name": "Dashboard", "description": "Dashboard statistics and analytics"},
@@ -177,7 +152,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth.router, prefix="/api", tags=["Auth"])
 app.include_router(upload.router, prefix="/api", tags=["Upload"])
 app.include_router(candidates.router, prefix="/api", tags=["Candidates"])
 app.include_router(dashboard.router, prefix="/api", tags=["Dashboard", "Search"])

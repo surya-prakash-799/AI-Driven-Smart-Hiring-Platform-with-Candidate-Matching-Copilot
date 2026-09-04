@@ -7,7 +7,6 @@ from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.core.database import get_db
-from app.routes.deps import get_current_user
 from app.schemas.candidate import CandidateResponse, UploadResponse
 from app.services import extractor, parser
 from app.services.candidate_service import upsert_candidate_from_extraction
@@ -21,7 +20,7 @@ from app.utils.file_helper import (
     validate_file_signature,
 )
 
-router = APIRouter(dependencies=[Depends(get_current_user)])
+router = APIRouter()
 settings = get_settings()
 
 _ALLOWED_MEDIA_TYPES = {

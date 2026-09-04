@@ -134,19 +134,6 @@ export interface CandidateUpdateInput {
   status?: string;
 }
 
-export interface AuthUser {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-}
-
-export interface AuthResponse {
-  access_token: string;
-  token_type: string;
-  user: AuthUser;
-}
-
 export interface JobPosition {
   id: number;
   title: string;
@@ -194,8 +181,17 @@ export interface VoiceScreeningItem {
   job_title: string;
   status: string;
   duration_seconds: number;
+  transcript?: string | null;
   result_summary: string;
   created_at: string;
+}
+
+export interface VoiceScreeningTranscriptResponse {
+  success: boolean;
+  candidate_id: number;
+  job_position_id: number;
+  transcript: string;
+  status: string;
 }
 
 

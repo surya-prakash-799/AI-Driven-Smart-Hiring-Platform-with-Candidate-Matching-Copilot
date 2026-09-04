@@ -276,8 +276,8 @@ def get_dashboard_stats(db: Session) -> dict[str, Any]:
         + int_counts.get("pending", 0)
         + int_counts.get("questions_generated", 0)
     )
-    # A pending interview is any interview that is not marked completed.
-    pending_interviews = total_interviews - int_completed
+    # A pending interview is one that has been created but not yet started, in progress, or completed.
+    pending_interviews = int_pending
 
     # 5. Uploads Today
     try:

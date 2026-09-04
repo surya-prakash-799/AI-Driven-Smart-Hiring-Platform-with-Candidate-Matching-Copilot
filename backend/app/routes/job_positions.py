@@ -5,7 +5,6 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.candidate import Candidate
 from app.models.job_position import JobPosition
-from app.routes.deps import get_current_user
 from app.schemas.job_position import (
     CandidateMatchItem,
     JobPositionCandidatesResponse,
@@ -19,7 +18,7 @@ from app.schemas.job_position import (
 from app.services import job_position_service
 from app.services.matching_service import generate_skill_gap_analysis
 
-router = APIRouter(dependencies=[Depends(get_current_user)])
+router = APIRouter()
 
 
 @router.post("/job-positions", response_model=JobPositionResponse, status_code=status.HTTP_201_CREATED)

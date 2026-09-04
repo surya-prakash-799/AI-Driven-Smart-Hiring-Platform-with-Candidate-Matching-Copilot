@@ -55,16 +55,42 @@ def check_db_connection() -> tuple[bool, str]:
         return False, str(e)
 
 
+def _ensure_voice_screening_transcript_column() -> None:
+    """Idempotently add the `transcript` column to voice_screenings if missing.
+
+    The app historically used Base.metadata.create_all, which creates missing
+    tables but does NOT alter existing tables. This lightweight migration keeps
+    the Voice Screening Speech-to-Text feature working on existing databases.
+    """
+    try:
+        with engine.begin() as conn:
+            cols = conn.execute(
+                text(
+                    "SELECT column_name FROM information_schema.columns "
+                    "WHERE table_name = 'voice_screenings' AND table_schema = current_schema()"
+                )
+            ).fetchall()
+            col_names = {row[0] for row in cols}
+            if "transcript" not in col_names:
+                conn.execute(
+                    text("ALTER TABLE voice_screenings ADD COLUMN transcript TEXT")
+                )
+                logger.info("Added 'transcript' column to voice_screenings.")
+    except Exception as e:
+        logger.warning(f"Could not ensure voice_screenings.transcript column: {e}")
+
+
 def init_db() -> tuple[bool, str]:
     """Create all tables if they do not exist. Never raises; returns (ok, message)."""
     try:
         Base.metadata.create_all(bind=engine)
+        _ensure_voice_screening_transcript_column()
         return True, "Database tables created/verified"
     except SQLAlchemyError as e:
         # Check if tables exist and are usable (e.g. PostgreSQL sequence/table race condition during concurrent startup)
         try:
             with engine.connect() as conn:
-                conn.execute(text("SELECT 1 FROM users LIMIT 1"))
+                conn.execute(text("SELECT 1 FROM candidates LIMIT 1"))
             logger.warning(f"Database table creation reported warning/conflict but tables exist and are accessible: {e}")
             return True, "Database tables verified"
         except Exception:

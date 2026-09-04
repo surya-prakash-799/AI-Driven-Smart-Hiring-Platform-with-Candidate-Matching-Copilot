@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.models.interview import InterviewAnswer, InterviewQuestion
-from app.routes.deps import get_current_user
 from app.schemas.interview import (
     InterviewAnswerCreate,
     InterviewAnswerResponse,
@@ -12,7 +11,7 @@ from app.schemas.interview import (
 )
 from app.services import interview_generator, interview_service
 
-router = APIRouter(dependencies=[Depends(get_current_user)])
+router = APIRouter()
 
 
 @router.post("/generate", response_model=InterviewResponse)

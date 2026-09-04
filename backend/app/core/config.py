@@ -45,12 +45,12 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     LOG_FILE_NAME: str = "recruitment.log"
 
-    SECRET_KEY: str = "ai-recruitment-copilot-secret-change-me"
-    TOKEN_TTL_HOURS: int = 24
-
     GEMINI_API_KEY: str = ""
     GEMINI_MODEL: str = "gemini-3.6-flash"
     AI_TIMEOUT_SECONDS: int = 60
+
+    GROQ_API_KEY: str = ""
+    GROQ_WHISPER_MODEL: str = "whisper-large-v3-turbo"
 
     model_config = {
         # Resolve the .env file relative to the project root so the app loads
