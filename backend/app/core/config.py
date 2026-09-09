@@ -24,10 +24,10 @@ class Settings(BaseSettings):
     EXTRACTED_DIR: str = str(_BASE_DIR / "app" / "extracted_data")
     LOG_DIR: str = str(_BASE_DIR / "app" / "logs")
     MAX_FILE_SIZE: int = 10 * 1024 * 1024  # 10 MB
-    ALLOWED_EXTENSIONS: list[str] = ["pdf", "docx"]
+    ALLOWED_EXTENSIONS: list[str] | str = ["pdf", "docx"]
     MAX_RESUME_TEXT_CHARS: int = 200_000
 
-    CORS_ORIGINS: list[str] = [
+    CORS_ORIGINS: list[str] | str = [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost:5174",
