@@ -107,13 +107,13 @@ export function getErrorMessage(error: unknown, fallback = 'Something went wrong
         typeof data === 'string' ||
         (typeof data === 'object' && !('detail' in (data as Record<string, unknown>))));
 
-    if (isBackendUnreachable) return 'Cannot reach the server. Is the backend running on http://localhost:8000?';
+    if (isBackendUnreachable) return 'Cannot reach the backend server. Please verify the backend status.';
     if (status === 413) return 'File is too large (maximum 10 MB).';
     if (status === 400) return 'Invalid request. Please check your input.';
     if (status === 404) return 'The requested resource was not found.';
     if (status === 401 || status === 403) return 'You are not authorized to perform this action.';
     if (status === 500) return 'The server encountered an error. Please try again later.';
-    if (!error.response) return 'Cannot reach the server. Is the backend running on http://localhost:8000?';
+    if (!error.response) return 'Cannot connect to backend server. This may be caused by a CORS restriction or the backend waking up.';
     return error.message || fallback;
   }
   if (error instanceof Error) return error.message;
